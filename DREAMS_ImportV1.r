@@ -4,7 +4,7 @@
 # Date:2022-10-22
 # Updated:2022:10:31 @ 11:18pm
 #Load Required libraries
-# Red text symbolizes comments
+# Orange text symbolizes comments
 
 #######################################################################################################################
 #  sources files used in the code include:                                                                            #
@@ -34,7 +34,7 @@ DREAMS_Orgunits<-read.csv("Data Exchange Organisation Units.csv") %>%  rename(su
 
 mechanisms <- read.csv("mechanisms.csv", stringsAsFactors=FALSE) %>% filter(ou=='South Africa') %>%  mutate(attributeOptionCombo="cDGPF739ZZr")
 
-#'[This block Process DREAMS Data and correcting the District name from short names to full names]
+#'[This block Process DREAMS Data and correcting the Districts name from short names to full names]
 
 AGYW_PREV_raw<- read_excel("AGYW_PREV_Export.xlsx", sheet = "Pivot_Data")%>% mutate(PSNU=case_when(district=="kz Uthukela District Municipality"~"kz Uthukela District Municipality",district=="gp Ekurhuleni Metropolitan Municipality"~"gp Ekurhuleni Metropolitan Municipality",
 district=="kz eThekwini Metropolitan Municipality"~"kz eThekwini Metropolitan Municipality",district=="ec Oliver Tambo District Municipality"~"ec Oliver Tambo District Municipality",
@@ -48,7 +48,7 @@ district=="kz Ugu District Municipality"~"kz Ugu District Municipality",district
 district=="lp Capricorn District Municipality"~"lp Capricorn District Municipality",district=="fs Thabo Mofutsanyane District Municipality"~"fs Thabo Mofutsanyane District Municipality",district=="fs Lejweleputswa District Municipality"~"fs Lejweleputswa District Municipality",
 district=="ec Alfred Nzo District Municipality"~"ec Alfred Nzo District Municipality"))  %>% mutate(old_sub_district=`sub-district`)
 
-#'[DREAMS Data is entered at Level 6 of the DATIM org unit hierarchy,this code clean P CBMIS names to match DATIM Org unit hierarchy]
+#'[DREAMS Data is entered at Level 6 of the DATIM org unit hierarchy,this code clean uP CBMIS names to match DATIM Org unit hierarchy]
 
 AGYW_PREV_raw<-AGYW_PREV_raw %>%  mutate(`sub-district`=case_when  (`sub-district`=="kz The Msunduzi Local Municipality"	~"kz Msunduzi Local Municipality",
            `sub-district`=="ec King Sabata Dalindyebo Health sub-District"	~"ec King Sabata Dalindyebo Local Municipality",
@@ -80,7 +80,7 @@ AGYW_PREV_raw<-AGYW_PREV_raw %>%  mutate(`sub-district`=case_when  (`sub-distric
            `sub-district`=="ec Port St Johns Health sub-District"	~"ec Port St Johns Local Municipality",
            `sub-district`	=="mp Mbombela Local Municipality"	~"mp City of Mbombela Local Municipality")) %>%  mutate(`sub-district`=if_else(is.na(`sub-district`),old_sub_district,`sub-district`)) %>% 
   select(-old_sub_district) %>%  rename (sub_district=`sub-district`)
-#'[This block transform  short names to align with DATIM and NDOH District Names;When CBMIS Uses short names for Districts please un-comment and use the code block below]
+#'[This block transform  short names to align with DATIM and NDOH District Names;Only When CBMIS Uses short names for Districts, please un-comment and use the code block below]
 
  # #mutate(PSNU=case_when(district=="Uthukela"~"kz Uthukela District Municipality",district=="Ekurhuleni"~"gp Ekurhuleni Metropolitan Municipality",
  #                          district=="eThekwini"~"kz eThekwini Metropolitan Municipality",district=="O.R.Tambo"~"ec Oliver Tambo District Municipality",
@@ -94,7 +94,7 @@ AGYW_PREV_raw<-AGYW_PREV_raw %>%  mutate(`sub-district`=case_when  (`sub-distric
  #                          district=="Capricorn"~"lp Capricorn District Municipality",district=="Thabo Mofutsanyane"~"fs Thabo Mofutsanyane District Municipality",district=="Lejweleputswa"~"fs Lejweleputswa District Municipality",
  #                          district=="Alfred Nzo"~"ec Alfred Nzo District Municipality"))
 
-#'[This block Removes all the Inactive beneficiaries from the CBMIS data set]
+#'[This code Removes all the Inactive beneficiaries from the CBMIS data set]
 
 AGYW_PREV1.0<-sqldf('select * from AGYW_PREV_raw where status  Not like "%Inactive%"')
 

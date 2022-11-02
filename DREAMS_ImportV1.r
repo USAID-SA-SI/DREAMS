@@ -3,7 +3,6 @@
 # Purpose: Automating the process of Reporting AGYW_PREV for Inter-agency
 # Date:2022-10-22
 # Updated:2022:10:31 @ 11:18pm
-#Load Required libraries
 # Orange text symbolizes comments
 
 #######################################################################################################################
@@ -13,7 +12,7 @@
 #              3) Data Exchange Organisation Units from DATIM Support                                                 #
 #              4) Mechanisms from DATIM support                                                                       #
 #######################################################################################################################
-
+#Load Required libraries
 library(tidyverse)
 library(readxl)
 library(lubridate)

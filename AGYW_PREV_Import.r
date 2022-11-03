@@ -2,9 +2,8 @@
 # Author: C. Trapence
 # Purpose: Automating the process of Reporting AGYW_PREV for Inter-agency
 # Date:2022-10-22
-# Updated:2022:10:31 @ 11:18pm
-#Load Required libraries
-# Red text symbolizes comments
+# Updated:2022:11:02 @ 11:18pm
+# LICENSE:  MIT
 
 #######################################################################################################################
 #  sources files used in the code include:                                                                            #
@@ -14,6 +13,8 @@
 #              4) Mechanisms from DATIM support                                                                       #
 #######################################################################################################################
 
+#Load Required libraries
+# Red text symbolizes comments
 library(tidyverse)
 library(readxl)
 library(lubridate)
@@ -32,7 +33,7 @@ DREAMS_Orgunits<-read.csv("Data Exchange Organisation Units.csv") %>%  rename(su
 
 #'[Mechanims names to get attributecombooption_id*
 
-mechanisms <- read.csv("mechanisms.csv", stringsAsFactors=FALSE) %>% filter(ou=='South Africa') %>%  mutate(attributeOptionCombo="cDGPF739ZZr")
+mechanisms <- read.csv("mechanisms.csv", stringsAsFactors=FALSE) %>% filter(ou=='South Africa') %>%  mutate(ou_uid="cDGPF739ZZr")
 
 #'[This block Process DREAMS Data and correcting the District name from short names to full names
 

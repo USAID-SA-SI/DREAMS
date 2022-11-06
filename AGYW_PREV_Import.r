@@ -2,8 +2,9 @@
 # Author: C. Trapence
 # Purpose: Automating the process of Reporting AGYW_PREV for Inter-agency
 # Date:2022-10-22
-# Updated:2022:11:03 @ 11:16am
-# LICENSE:  MIT
+# Updated:2022:10:31 @ 11:18pm
+#Load Required libraries
+# Red text symbolizes comments
 
 #######################################################################################################################
 #  sources files used in the code include:                                                                            #
@@ -13,8 +14,6 @@
 #              4) Mechanisms from DATIM support                                                                       #
 #######################################################################################################################
 
-#Load Required libraries
-# Red text symbolizes comments
 library(tidyverse)
 library(readxl)
 library(lubridate)
@@ -33,7 +32,7 @@ DREAMS_Orgunits<-read.csv("Data Exchange Organisation Units.csv") %>%  rename(su
 
 #'[Mechanims names to get attributecombooption_id*
 
-mechanisms <- read.csv("mechanisms.csv", stringsAsFactors=FALSE) %>% filter(ou=='South Africa') %>%  mutate(ou_uid="cDGPF739ZZr")
+mechanisms <- read.csv("mechanisms.csv", stringsAsFactors=FALSE) %>% filter(ou=='South Africa') %>%  mutate(attributeOptionCombo="cDGPF739ZZr")
 
 #'[This block Process DREAMS Data and correcting the District name from short names to full names
 
@@ -50,7 +49,7 @@ district=="lp Capricorn District Municipality"~"lp Capricorn District Municipali
 district=="ec Alfred Nzo District Municipality"~"ec Alfred Nzo District Municipality"))  %>% mutate(old_sub_district=`sub-district`)
 
 #'[DREAMS Data is entered at Level 6 of the DATIM org unit hierarchy,this code clean P CBMIS names to match DATIM Org unit hierarchy]
-
+#hobSH0yvAJF
 AGYW_PREV_raw<-AGYW_PREV_raw %>%  mutate(`sub-district`=case_when  (`sub-district`=="kz The Msunduzi Local Municipality"	~"kz Msunduzi Local Municipality",
            `sub-district`=="ec King Sabata Dalindyebo Health sub-District"	~"ec King Sabata Dalindyebo Local Municipality",
            `sub-district`=="gp Ekurhuleni East 1 Health sub-District"	~"gp Ekurhuleni East 1 Local Municipality",
@@ -60,7 +59,7 @@ AGYW_PREV_raw<-AGYW_PREV_raw %>%  mutate(`sub-district`=case_when  (`sub-distric
            `sub-district`=="ec Ntabankulu Health sub-District"	~"ec Ntabankulu Local Municipality",
            `sub-district`=="ec Ingquza Hill Health sub-District"	~"ec Ingquza Hill Local Municipality",
            `sub-district`=="mp Albert Luthuli Local Municipality"	~"mp Chief Albert Luthuli Local Municipality",
-           `sub-district`=="mp Pixley Ka Seme Local Municipality"	~"nc Pixley ka Seme District Municipality",
+           `sub-district`=="mp Pixley Ka Seme Local Municipality"	~"mp Dr Pixley Ka Isaka Seme Local Municipality",
            `sub-district`=="ec Matatiele Health sub-District"	~"ec Matatiele Local Municipality",
            `sub-district`=="fs Maluti a Phofung Local Municipality"	~"fs Maluti-a-Phofung Local Municipality",
            `sub-district`=="gp Ekurhuleni East 2 Health sub-District"	~"gp Ekurhuleni East 2 Local Municipality",
@@ -80,7 +79,7 @@ AGYW_PREV_raw<-AGYW_PREV_raw %>%  mutate(`sub-district`=case_when  (`sub-distric
            `sub-district`=="kz uMhlathuze Local Municipality"	~"kz City of uMhlathuze Local Municipality",
            `sub-district`=="ec Port St Johns Health sub-District"	~"ec Port St Johns Local Municipality",
            `sub-district`	=="mp Mbombela Local Municipality"	~"mp City of Mbombela Local Municipality")) %>%  mutate(`sub-district`=if_else(is.na(`sub-district`),old_sub_district,`sub-district`)) %>% 
-  select(-old_sub_district) %>%  rename (sub_district=`sub-district`)
+  select(-old_sub_district) %>%  rename (sub_district=`sub-district`) %>%filter(`served by primary package partner`=="Yes")
 #'[This block transform  short names to align with DATIM and NDOH District Names;When CBMIS Uses short names for Districts please un-comment and use the code block below]
 
  # #mutate(PSNU=case_when(district=="Uthukela"~"kz Uthukela District Municipality",district=="Ekurhuleni"~"gp Ekurhuleni Metropolitan Municipality",
@@ -130,18 +129,21 @@ Host_results<-read.csv("Host Country Results DREAMS (USG).csv")   %>%  mutate(ca
 
 tempfile1.3<-left_join(tempfile1.2,Host_results,by="categoryoptioncombo") %>%  rename (categoryOptionCombo=categoryoptioncombocode) %>%  mutate(attributeOptionCombo="HllvX50cXC0")  %>% 
   mutate(dataelementuid=if_else(status==" Received (completed) an evidence-based intervention focused on preventing violence within the reporting period","e9eMQs1jUCB",if_else(
-                                   status==" Received educational support to remain in, advance, and/or rematriculate in school within the reporting period","KqAes2sA33z",dataelementuid)))
+                                   status==" Received educational support to remain in, advance, and/or rematriculate in school within the reporting period","KqAes2sA33z",
+                                   if_else(status==" Completed comprehensive economic strengthening in reporting period","RKP1oBz321O",dataelementuid))))
 tempfile1.3<-tempfile1.3 %>% mutate (categoryOptionCombo=if_else(is.na(categoryOptionCombo),"HllvX50cXC0",categoryOptionCombo)) 
 tempfile1.3<-tempfile1.3 %>% mutate (dataelementdesc=if_else((categoryOptionCombo)=="HllvX50cXC0","Number of individual AGYW that have completed at least the DREAMS primary package of services/interventions at the time of reporting",dataelementdesc)) 
 tempfile1.3<-tempfile1.3 %>% mutate (dataelementdesc=if_else((categoryOptionCombo)=="HllvX50cXC0","Number of individual AGYW that have completed at least the DREAMS primary package of services/interventions at the time of reporting",dataelementdesc)) 
 tempfile1.3<-tempfile1.3 %>% mutate (dataelement=if_else((dataelementuid)=="e9eMQs1jUCB","AGYW_PREV (D, NoApp, ViolencePrevention): DREAMS): DREAMS",dataelement)) 
-tempfile1.3<-tempfile1.3 %>% mutate (dataelement=if_else((dataelementuid)=="KqAes2sA33z","AGYW_PREV (D, NoApp, EducationSupport): DREAMS",dataelement)) 
+tempfile1.3<-tempfile1.3 %>% mutate (dataelement=if_else((dataelementuid)=="KqAes2sA33z","AGYW_PREV (D, NoApp, EducationSupport): DREAMS",dataelement))
+tempfile1.3<-tempfile1.3 %>% mutate (dataelement=if_else((dataelementuid)=="RKP1oBz321O","AGYW_PREV (D, NoApp, ComprehensiveEconomicStrengthening): DREAMS",dataelement))
 tempfile1.3<-tempfile1.3 %>% mutate (dataset=if_else(is.na(dataset),"Host Country Results: DREAMS (USG)",dataset)) 
 
 AGYW_Import_File<-tempfile1.3 %>%  select(district,sub_district,sub_districtuid,catecombo,dataelementuid,dataelement,categoryOptionCombo,categoryoptioncombo,attributeOptionCombo,Value) %>%  mutate(period="2022Q3") %>%
   group_by(district,sub_district,sub_districtuid,catecombo,dataelementuid,attributeOptionCombo,dataelement,categoryOptionCombo,categoryoptioncombo,period) %>%  summarise_at(vars(Value), sum, na.rm = TRUE) 
 
-AGYW_DREAMS<-AGYW_Import_File%>% data.frame() %>% select(dataelementuid,period,sub_districtuid,categoryOptionCombo,attributeOptionCombo,Value)   %>% rename( Orgunit=sub_districtuid, dataElement = dataelementuid)
+AGYW_DREAMS<-AGYW_Import_File%>% data.frame() %>% select(dataelementuid,period,sub_districtuid,categoryOptionCombo,attributeOptionCombo,Value)   %>% rename( Orgunit=sub_districtuid, dataElement = dataelementuid) %>%  
+  group_by(dataElement,period,Orgunit,categoryOptionCombo,attributeOptionCombo) %>%  summarise(Value=sum(Value))
 
 #'[Warning!] *The code below will close any opened excel document on your computer and make sure you have saved all your excel documents before running it*
 

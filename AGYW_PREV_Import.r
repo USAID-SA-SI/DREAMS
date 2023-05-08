@@ -2,7 +2,7 @@
 # Author: C. Trapence
 # Purpose: Automating the process of Reporting AGYW_PREV for Inter-agency
 # Date:2022-10-22
-# Updated:2023:05:04 by JM @ 12:35pm
+# Updated:2023:05:08 by J.Milimu @ 05:10pm
 #Load Required libraries
 # Red text symbolizes comments
 
@@ -65,13 +65,13 @@ AGYW_PREV_raw<- read_excel(here("Data/DREAMS",AGYW_Prev), sheet = "Pivot_Data") 
 AGYW_PREV_raw<-AGYW_PREV_raw %>%  mutate(`sub-district`=case_when  (`sub-district`=="kz The Msunduzi Local Municipality"	~"kz Msunduzi Local Municipality",
                                                                     `sub-district`=="ec King Sabata Dalindyebo Health sub-District"	~"ec King Sabata Dalindyebo Local Municipality",
                                                                     `sub-district`=="gp Ekurhuleni East 1 Health sub-District"	~"gp Ekurhuleni East 1 Local Municipality",
-                                                                    `sub-district`=="kz eThekwini Metropolitan Municipality Sub"	~"kz eThekwini Metropolitan Municipality Sub - DM EHS",
+                                                                    `sub-district`=="kz eThekwini Metropolitan Municipality Sub"	~"kz eThekwini Metropolitan Municipality Sub",
                                                                     `sub-district`=="lp Polokwane Local Municipality"	~"lp Polokwane Local Municipality EHP",
                                                                     `sub-district`=="kz Mfolozi Local Municipality"	~"kz uMfolozi Local Municipality",
                                                                     `sub-district`=="ec Ntabankulu Health sub-District"	~"ec Ntabankulu Local Municipality",
                                                                     `sub-district`=="ec Ingquza Hill Health sub-District"	~"ec Ingquza Hill Local Municipality",
                                                                     `sub-district`=="mp Albert Luthuli Local Municipality"	~"mp Chief Albert Luthuli Local Municipality",
-                                                                    `sub-district`=="mp Pixley Ka Seme Local Municipality"	~"mp Pixley ka Seme District Municipality",
+                                                                    `sub-district`=="mp Pixley Ka Seme Local Municipality"	~"mp Dr Pixley Ka Isaka Seme Local Municipality",
                                                                     `sub-district`=="ec Matatiele Health sub-District"	~"ec Matatiele Local Municipality",
                                                                     `sub-district`=="fs Maluti a Phofung Local Municipality"	~"fs Maluti-a-Phofung Local Municipality",
                                                                     `sub-district`=="gp Ekurhuleni East 2 Health sub-District"	~"gp Ekurhuleni East 2 Local Municipality",
@@ -140,15 +140,17 @@ tempfile1.2<-tempfile1.1 %>%  mutate(categoryoptioncombo=gsub("pa","Pa",category
 
 tempfile1.3<-left_join(tempfile1.2,Host_results,by="categoryoptioncombo") %>%  rename (categoryOptionCombo=categoryoptioncombocode) %>%  mutate(attributeOptionCombo="HllvX50cXC0")  %>% 
   mutate(dataelementuid=if_else(status==" Received (completed) an evidence-based intervention focused on preventing violence within the reporting period","e9eMQs1jUCB",if_else(
-    status==" Received educational support to remain in, advance, and/or rematriculate in school within the reporting period","KqAes2sA33z",dataelementuid)))
+    status==" Received educational support to remain in, advance, and/or rematriculate in school within the reporting period","KqAes2sA33z",if_else(status==" Completed comprehensive economic strengthening in reporting period","RKP1oBz321O",dataelementuid))))
 tempfile1.3<-tempfile1.3 %>% mutate (categoryOptionCombo=if_else(is.na(categoryOptionCombo),"HllvX50cXC0",categoryOptionCombo)) 
 tempfile1.3<-tempfile1.3 %>% mutate (dataelementdesc=if_else((categoryOptionCombo)=="HllvX50cXC0","Number of individual AGYW that have completed at least the DREAMS primary package of services/interventions at the time of reporting",dataelementdesc)) 
 tempfile1.3<-tempfile1.3 %>% mutate (dataelementdesc=if_else((categoryOptionCombo)=="HllvX50cXC0","Number of individual AGYW that have completed at least the DREAMS primary package of services/interventions at the time of reporting",dataelementdesc)) 
 tempfile1.3<-tempfile1.3 %>% mutate (dataelement=if_else((dataelementuid)=="e9eMQs1jUCB","AGYW_PREV (D, NoApp, ViolencePrevention): DREAMS): DREAMS",dataelement)) 
 tempfile1.3<-tempfile1.3 %>% mutate (dataelement=if_else((dataelementuid)=="KqAes2sA33z","AGYW_PREV (D, NoApp, EducationSupport): DREAMS",dataelement)) 
+tempfile1.3<-tempfile1.3 %>% mutate (dataelement=if_else((dataelementuid)=="RKP1oBz321O","AGYW_PREV (D, NoApp, ComprehensiveEconomicStrengthening): DREAMS",dataelement)) 
+
 tempfile1.3<-tempfile1.3 %>% mutate (dataset=if_else(is.na(dataset),"Host Country Results: DREAMS (USG)",dataset)) 
 
-AGYW_Import_File<-tempfile1.3 %>%  select(district,sub_district,sub_districtuid,catecombo,dataelementuid,dataelement,categoryOptionCombo,categoryoptioncombo,attributeOptionCombo,Value) %>%  mutate(period="2022Q3") %>%
+AGYW_Import_File<-tempfile1.3 %>%  select(district,sub_district,sub_districtuid,catecombo,dataelementuid,dataelement,categoryOptionCombo,categoryoptioncombo,attributeOptionCombo,Value) %>%  mutate(period="2023Q1") %>%
   group_by(district,sub_district,sub_districtuid,catecombo,dataelementuid,attributeOptionCombo,dataelement,categoryOptionCombo,categoryoptioncombo,period) %>%  summarise_at(vars(Value), sum, na.rm = TRUE) 
 
 AGYW_DREAMS<-AGYW_Import_File%>% data.frame() %>% select(dataelementuid,period,sub_districtuid,categoryOptionCombo,attributeOptionCombo,Value)   %>% rename( Orgunit=sub_districtuid, dataElement = dataelementuid)

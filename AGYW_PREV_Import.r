@@ -156,20 +156,18 @@ AGYW_Import_File<-tempfile1.3 %>%  select(district,sub_district,sub_districtuid,
 
 AGYW_DREAMS<-AGYW_Import_File%>% data.frame() %>% select(dataelementuid,period,sub_districtuid,categoryOptionCombo,attributeOptionCombo,Value)   %>% rename( Orgunit=sub_districtuid, dataElement = dataelementuid)
 
-#'[Warning!] *The code below will close any opened excel document on your computer and make sure you have saved all your excel documents before running it*
-#'
+#'[Preview File in human Readable format]
 file_name_xlsx<-paste0(Sys.Date(),"_AGYW_PREV_",current_quarter,".xlsx")
 
 
 
-shell("taskkill /im EXCEL.exe /f /t")
-
 #'[This output "AGYW_Prev_Review.xlsx" is to assist in checking the numbers against CBMIS results]
-write.xlsx(AGYW_Import_File,file.path(here("Dataout"),file_name))
+write.xlsx(AGYW_Import_File,file.path(here("Dataout"),file_name_xlsx))
 
 #'[Final import output below]
 
 #write_csv(AGYW_DREAMS,"AGYW_PREV_Final.csv")
 
 file_name_csv<-paste0(Sys.Date(),"_AGYW_PREV_",current_quarter,".csv")
+
 write_csv(AGYW_DREAMS, file.path(here("Dataout"),file_name_csv))

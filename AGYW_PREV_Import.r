@@ -13,7 +13,7 @@
 #              3) Data Exchange Organisation Units from DATIM Support                                                 #
 #              4) Mechanisms from DATIM support                                                                       #
 #######################################################################################################################
-
+#Loading pakages
 if(!require(pacman)) install.packages("pacman")
 pacman::p_load(tidyverse, here,lubridate, data.table,sqldf,stringr,readxl,patchwork, janitor, esquisse, flextable)
 

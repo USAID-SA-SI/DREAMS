@@ -14,17 +14,9 @@
 #              4) Mechanisms from DATIM support                                                                       #
 #######################################################################################################################
 
+if(!require(pacman)) install.packages("pacman")
+pacman::p_load(tidyverse, here,lubridate, data.table,sqldf,stringr,readxl,patchwork, janitor, esquisse, flextable)
 
-library(tidyverse)
-library(here)
-library(readxl)
-library(lubridate)
-library(readr)
-library(excel.link)
-library(openxlsx)
-library(data.table)
-library(sqldf)
-library(stringr)
 
 #'[GLOBAL VARIABLES --------------------------------------------------------
 
@@ -153,9 +145,15 @@ tempfile1.3<-tempfile1.3 %>% mutate (dataelement=if_else((dataelementuid)=="RKP1
 tempfile1.3<-tempfile1.3 %>% mutate (dataset=if_else(is.na(dataset),"Host Country Results: DREAMS (USG)",dataset))
 
 AGYW_Import_File<-tempfile1.3 %>%  select(district,sub_district,sub_districtuid,catecombo,dataelementuid,dataelement,categoryOptionCombo,categoryoptioncombo,attributeOptionCombo,Value) %>%  mutate(period="2023Q3") %>%
-group_by(district,sub_district,sub_districtuid,catecombo,dataelementuid,attributeOptionCombo,dataelement,categoryOptionCombo,categoryoptioncombo,period) %>%  summarise_at(vars(Value), sum, na.rm = TRUE)
+group_by(district,sub_district,sub_districtuid,catecombo,dataelementuid,attributeOptionCombo,dataelement,categoryOptionCombo,categoryoptioncombo,period) %>%  summarise_at(vars(Value), sum, na.rm = TRUE) %>% rename(categoryoptioncombo_key=categoryoptioncombo )
 
-AGYW_DREAMS<-AGYW_Import_File%>% data.frame() %>% select(dataelementuid,period,sub_districtuid,categoryOptionCombo,attributeOptionCombo,Value)   %>% rename( Orgunit=sub_districtuid, dataElement = dataelementuid)
+AGYW_Import_Filev2<-sqldf("select sum(Value),*  from AGYW_Import_File group by district,sub_district,sub_district,dataelementuid,categoryOptionCombo,categoryoptioncombo,period") %>% mutate(Value=`sum(Value)`) %>% select(-`sum(Value)`   )
+
+
+#AGYW_Import_Filev2<-sqldf("select sum(Value),*  from AGYW_Import_File group by district,sub_district,sub_districtuid,catecombo,dataelementuid,attributeOptionCombo,dataelement,categoryOptionCombo,categoryoptioncombo,period,categoryoptioncombo_key") %>% mutate(Value=`sum(Value)`) %>% select(-`sum(Value)`   )
+
+AGYW_DREAMS<-AGYW_Import_Filev2%>% data.frame() %>% select(dataelementuid,period,sub_districtuid,categoryOptionCombo,attributeOptionCombo,Value)   %>% rename( Orgunit=sub_districtuid, dataElement = dataelementuid)
+
 
 #'[Preview File in human Readable format]
 
@@ -163,7 +161,7 @@ file_name_xlsx<-paste0(Sys.Date(),"_AGYW_PREV_",current_quarter,".xlsx")
 
 
 #'[The purpose of the "AGYW_Prev_Review.xlsx" output is to aid in verifying the figures against the results in CBMIS.]
-write.xlsx(AGYW_Import_File,file.path(here("Dataout"),file_name_xlsx))
+write.xlsx(AGYW_Import_Filev2,file.path(here("Dataout"),file_name_xlsx))
 
 #'[The Final import output in CSV format below adheres to DATIM's machine-readable format requirements.]
 
